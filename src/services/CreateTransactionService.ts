@@ -15,8 +15,12 @@ class CreateTransactionService {
   }
 
   public execute({ title, value, type }: Request): Transaction {
-    const findTransctionsBalance = this.transactionsRepository.getBalance();
-    const validadeOutcomeRequest = findTransctionsBalance.total - value;
+    if (!['income', 'outcome'].includes(type)) {
+      throw new Error('Transation type is invalid');
+    }
+
+    const { total } = this.transactionsRepository.getBalance();
+    const validadeOutcomeRequest = total - value;
 
     if (validadeOutcomeRequest < 0 && type === 'outcome') {
       throw Error('The outcome value is bigger than total value');
